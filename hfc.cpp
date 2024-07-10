@@ -79,7 +79,7 @@ private:
 
     std::string decryptData(const std::string &data, int key)
     {
-        return encryptData(data, key); // XOR encryption is symmetric
+        return encryptData(data, key);
     }
 
     std::string bitsToString(const std::string &bits)
@@ -105,7 +105,6 @@ private:
 public:
     void compressFile(const std::string &inputFile, const std::string &outputFile, int key)
     {
-        // Read input file
         std::ifstream inFile(inputFile, std::ios::binary);
         if (!inFile)
         {
@@ -117,10 +116,8 @@ public:
 
         std::cout << "Input file size: " << text.length() << " bytes" << std::endl;
 
-        // Compress and encrypt
         std::string compressed = compress(text, key);
 
-        // Write compressed data to output file
         std::ofstream outFile(outputFile, std::ios::binary);
         if (!outFile)
         {
@@ -128,7 +125,6 @@ public:
             return;
         }
 
-        // Write Huffman codes to the file
         uint32_t codeCount = huffmanCodes.size();
         outFile.write(reinterpret_cast<const char *>(&codeCount), sizeof(codeCount));
         for (const auto &pair : huffmanCodes)
@@ -149,7 +145,6 @@ public:
 
     void decompressFile(const std::string &inputFile, const std::string &outputFile, int key)
     {
-        // Read compressed file
         std::ifstream inFile(inputFile, std::ios::binary);
         if (!inFile)
         {
@@ -157,7 +152,6 @@ public:
             return;
         }
 
-        // Read Huffman codes
         std::unordered_map<char, std::string> codes;
         uint32_t codeCount;
         inFile.read(reinterpret_cast<char *>(&codeCount), sizeof(codeCount));
@@ -172,16 +166,13 @@ public:
             codes[ch] = code;
         }
 
-        // Read compressed data
         std::string compressed((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
         inFile.close();
 
         std::cout << "Compressed data size: " << compressed.length() << " bytes" << std::endl;
 
-        // Decompress
         std::string decompressed = decompress(compressed, key, codes);
 
-        // Write decompressed data to output file
         std::ofstream outFile(outputFile, std::ios::binary);
         if (!outFile)
         {
@@ -211,7 +202,6 @@ public:
         for (char c : text)
             compressed += huffmanCodes[c];
 
-        // Pad the compressed string to ensure it's a multiple of 8 bits
         uint8_t paddingLength = 8 - (compressed.length() % 8);
         if (paddingLength < 8)
         {
@@ -273,7 +263,7 @@ public:
                 currentCode.clear();
                 if (decompressed.length() == originalLength)
                 {
-                    break; // Stop when we've decoded the original text length
+                    break;
                 }
             }
         }
